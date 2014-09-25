@@ -1,0 +1,145 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Homework 7</title>
+		<script src="third-party/d3.min.js"></script>
+		<script src="third-party/c3.min.js"></script>
+		<script src="third-party/papaparse.js"></script>
+		<script src="third-party/jquery.js"></script>
+		<link href="third-party/c3.css" rel="stylesheet">
+		
+		<style>
+			body
+			{
+				font-family: sans-serif;
+				margin-left:30px
+			}
+			#canvas-holder
+			{
+				margin-top:40px;
+			}
+			#fileChooser
+			{
+				margin-bottom:75px;
+			}
+			#selectmenu
+			{
+				float:right;
+			}
+			span
+			{
+				font-size:small;
+			}
+			li
+			{
+				font-size:small;
+			}
+			h3
+			{
+				margin-bottom:40px;
+			}
+
+		</style>
+	</head>
+	<body>
+		<h2>CS 4460 - Homework 7</h2>
+		<h3>Steven Moore and Ian Stainbrook</h3>
+		<p>Select population.csv from the local file system. Click items in the legend to populate the chart.</p>
+		<div><input id="fileChooser" type="file"></input></div>
+	
+		<div id="chart"></div>
+
+
+	<script>
+	
+	var rawData;
+
+	
+
+	$('#fileChooser').change(function() {
+	Papa.parse(($('#fileChooser'))[0].files[0], {
+		complete: function(results) {	//when finished parsing...
+			rawData = results.data;
+			//console.log(rawData);
+			
+			var rows = [];
+			var categories = [];
+			categories.push('x');
+			var age = 0;
+			while (age <= 85)
+			{
+				categories.push('Males '+age+'-'+(age+5) );
+				categories.push('Females '+age+'-'+(age+5));
+				categories.push('Both '+age+'-'+(age+5));
+				age+=5;
+			}
+			categories.push('Males 90+');
+			categories.push('Females 90+');
+			categories.push('Both 90+');
+			
+			//console.log(categories);
+			
+			rows.push(categories);
+			
+			var year = 1850;
+			var i = 1;
+			var current = [];
+			var pushed = 0;
+			
+			current.push(year);
+			
+			while (i < rawData.length)
+			{
+				if (pushed == 57)
+				{
+					year += 10;
+					if (year == 1890)
+					{
+						year += 10;
+					}
+					rows.push(current);
+					current = [];
+					current.push(year);
+					pushed = 0;
+					
+				}
+				
+				current.push(parseInt(rawData[i][3]));
+				i++;
+				pushed++;
+				current.push(parseInt(rawData[i][3]));
+				pushed++;
+
+				if (i % 2 == 0)
+				{
+					//console.log(i);
+					current.push(parseInt(rawData[i][3]) + parseInt(rawData[i-1][3]));
+					pushed++;
+				}
+				
+				
+				i++;
+				
+			}
+			rows.push(current);
+			
+			console.log(rows);
+			
+			var chart = c3.generate({
+				data: {
+				x: 'x',
+				rows: rows
+				}
+			});
+			
+			chart.hide();
+		}
+	});
+	});
+
+
+
+
+	</script>
+	</body>
+</html>
