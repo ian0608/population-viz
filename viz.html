@@ -7,6 +7,7 @@
 		<script src="third-party/papaparse.js"></script>
 		<script src="third-party/jquery.js"></script>
 		<link href="third-party/c3.css" rel="stylesheet">
+		<link href="style.css" rel="stylesheet">
 		
 		<style>
 			body
@@ -44,8 +45,8 @@
 	<body>
 		<h2>CS 4460 - Homework 7</h2>
 		<h3>Steven Moore and Ian Stainbrook</h3>
-		<p>Select population.csv from the local file system. Click items in the legend to populate the chart.</p>
-		<div><input id="fileChooser" type="file"></input></div>
+		<p>Select population.csv from the local file system. Click items in the legend to populate the chart. Best viewed in Google Chrome.</p>
+		<div><input id="fileChooser" type="file"></div>
 	
 		<div id="chart"></div>
 
@@ -129,10 +130,53 @@
 				data: {
 				x: 'x',
 				rows: rows
+				},
+				legend: {
+					show: false
+				},
+				axis: {
+					y: {
+						min: 0,
+						// Range includes padding, set 0 if no padding needed
+						padding: {top:0, bottom:0}
+						}
 				}
 			});
 			
 			chart.hide();
+			
+			//var legend = d3.select("body").insert('div', '.chart').attr('class', 'legend');
+			
+			var males = d3.select("#males");
+			var females = d3.select("#females");
+			var both = d3.select("#both");
+			
+			age = 0;
+			while (age <= 85)
+			{
+				males.append('span').attr('data-id', 'Males '+age+'-'+(age+5)).html('<input type=\'checkbox\'> Males '+age+'-'+(age+5));
+				females.append('span').attr('data-id', 'Females '+age+'-'+(age+5)).html('<input type=\'checkbox\'> Females '+age+'-'+(age+5));
+				both.append('span').attr('data-id', 'Both '+age+'-'+(age+5)).html('<input type=\'checkbox\'> Both '+age+'-'+(age+5));
+
+				age+=5;
+			}
+			
+			males.append('span').attr('data-id', 'Males 90+').html('<input type=\'checkbox\'> Males 90+');
+			females.append('span').attr('data-id', 'Females 90+').html('<input type=\'checkbox\'> Females 90+');
+			both.append('span').attr('data-id', 'Both 90+').html('<input type=\'checkbox\'> Both 90+');
+			
+			d3.selectAll('.legend span')
+				.each(function () {
+					var id = d3.select(this).attr('data-id');
+					d3.select(this).style('background-color', chart.color(id));
+			})
+			.on('click', function () {
+				var id = d3.select(this).attr('data-id');
+				chart.toggle(id);
+				d3.select(this).select("input").property('checked', !(d3.select(this).select("input").property('checked')) );
+			})
+			
+			
 		}
 	});
 	});
@@ -141,5 +185,10 @@
 
 
 	</script>
+	
+	<div class="legend">
+		<div id="males"></div><div id="females"></div><div id="both"></div>
+	</div>
+	
 	</body>
 </html>
